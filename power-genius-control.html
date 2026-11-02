@@ -1,0 +1,64 @@
+<script type="text/javascript">
+    RED.nodes.registerType("power-genius-control", {
+        category: "Power Genius",
+        color: "#a6bbcf",
+        defaults: {
+            name: { value: "" },
+            server: { type: "power-genius-server", required: true },
+            action: { value: "" },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "bridge.svg",
+        label: function () {
+            return this.name || "pg control";
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="power-genius-control">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-server"></i> Server</label>
+        <input type="text" id="node-input-server" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-action"><i class="fa fa-cog"></i> Action</label>
+        <select id="node-input-action">
+            <option value="">msg.topic</option>
+            <option value="command">command</option>
+            <option value="save">save</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/markdown" data-help-name="power-genius-control">
+Sends commands to the Power Genius XL.
+
+### Input
+
+: topic (string) : `command` or `save`. Only used when the node's Action is set to `msg.topic`; a fixed action in the node always takes precedence.
+
+: payload (string) : Depends on the action:
+
+| Action | Payload | Effect |
+|---|---|---|
+| `command` | The command to send, for example `setup read` | Sends the command as it is and outputs the reply |
+| `save` | ignored | Saves the configuration. **The amplifier reboots.** |
+
+### Output
+
+: topic (string) : The action.
+: payload (string) : The reply message from the amplifier, for example `key=value key=value ...`.
+
+A failed command is reported as an error on the node.
+
+### Details
+
+The API documentation only describes configuration commands, so `command` is the way to send anything else.
+Setting commands such as `ifconf`, `catradio` and `flexradio` change the amplifier's configuration and take
+effect after `save`.
+</script>

@@ -1,0 +1,103 @@
+<script type="text/javascript">
+    RED.nodes.registerType("power-genius-status", {
+        category: "Power Genius",
+        color: "#a6bbcf",
+        defaults: {
+            name: { value: "" },
+            server: { type: "power-genius-server", required: true },
+            property: { value: "*" },
+            onlyChange: { value: true },
+            deadband: { value: 0, validate: function (v) { return v === "" || v === undefined || (!isNaN(v) && Number(v) >= 0); } },
+            startDelay: { value: 1000, validate: function (v) { return v === "" || v === undefined || (!isNaN(v) && Number(v) >= 0); } },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "bridge.svg",
+        label: function () {
+            if (this.name) return this.name;
+            return this.property && this.property !== "*" ? "pg " + this.property : "pg status";
+        },
+        oneditprepare: function () {
+            const sync = () => {
+                const p = $("#node-input-property").val();
+                $("#node-input-deadband-row").toggle(p !== "*" && p !== "");
+            };
+            $("#node-input-property").on("input change", sync);
+            sync();
+        },
+        oneditsave: function () {
+            if (!$("#node-input-property").val().trim()) $("#node-input-property").val("*");
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="power-genius-status">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-server"></i> Server</label>
+        <input type="text" id="node-input-server" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-property"><i class="fa fa-filter"></i> Property</label>
+        <input type="text" id="node-input-property" list="power-genius-properties" style="width:70%" placeholder="* = all, as an object" />
+        <datalist id="power-genius-properties">
+            <option value="*"></option>
+            <option value="state"></option>
+            <option value="meffa"></option>
+        </datalist>
+    </div>
+    <div class="form-row">
+        <label for="node-input-onlyChange">&nbsp;</label>
+        <input type="checkbox" id="node-input-onlyChange" style="display:inline-block; width:auto; vertical-align:top;" />
+        <label for="node-input-onlyChange" style="width:70%">Only emit when the value changes</label>
+    </div>
+    <div class="form-row" id="node-input-deadband-row">
+        <label for="node-input-deadband"><i class="fa fa-arrows-v"></i> Deadband</label>
+        <input type="number" id="node-input-deadband" min="0" step="any" style="width:100px" />
+        <span style="margin-left:5px">numeric values: ignore smaller changes (0 = off)</span>
+    </div>
+    <div class="form-row">
+        <label for="node-input-startDelay"><i class="fa fa-hourglass-start"></i> Start delay</label>
+        <input type="number" id="node-input-startDelay" min="0" step="100" style="width:100px" />
+        <span style="margin-left:5px">ms before the first output after deploy</span>
+    </div>
+</script>
+
+<script type="text/markdown" data-help-name="power-genius-status">
+Emits one Power Genius XL status property, or the whole status, when it changes.
+
+Use one node per property you care about. The property is free text, because the amplifier reports more
+than the API documentation lists: leave it as `*` and look at the whole object to see what your amplifier sends.
+
+### Input
+
+Any message emits the last known value, even if unchanged, and refreshes the status from the device.
+
+### Output
+
+: payload (number | string | object) : The value of the selected property, or the whole status object when `*` is selected.
+: topic (string) : The property name, or `status` when `*` is selected.
+: previous (number | string) : The previously emitted value (single property only; undefined for the first message).
+
+### Properties
+
+The `status` reply is a list of `key=value` pairs. Numeric values are emitted as numbers, everything else as text.
+
+| Property | Meaning | Values |
+|---|---|---|
+| `state` | Amplifier state | for example `STANDBY`, or `REBOOT` after a save |
+| `meffa` | MeFFA state | for example `OFF` |
+
+Other properties are reported by the device but not documented.
+
+### Details
+
+With *Only emit when the value changes* on, the first value after (re)connecting is always emitted.
+The *Start delay* holds back all output for that many milliseconds after the flow is deployed, then emits
+the latest known status. This gives downstream nodes such as dashboard widgets time to initialize.
+The *Deadband* suppresses numeric changes smaller than the given amount, relative to the last emitted value,
+which is useful for noisy values such as power and temperature.
+</script>

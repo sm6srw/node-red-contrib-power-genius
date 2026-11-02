@@ -1,0 +1,67 @@
+<script type="text/javascript">
+    RED.nodes.registerType("power-genius-server", {
+        category: "config",
+        defaults: {
+            host: { value: "localhost", required: true },
+            port: { value: 9008, required: true, validate: RED.validators.number() },
+            autoConnect: { value: true },
+            pollInterval: { value: 1000, validate: RED.validators.number() },
+            terminator: { value: "LF" },
+        },
+        label: function () {
+            return "power genius at " + this.host + ":" + this.port;
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="power-genius-server">
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-bookmark"></i> Host</label>
+        <input type="text" id="node-config-input-host" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="fa fa-bookmark"></i> Port</label>
+        <input type="text" id="node-config-input-port" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-autoConnect"><i class="fa fa-plug"></i> Auto connect</label>
+        <input type="checkbox" id="node-config-input-autoConnect" style="width:auto" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-pollInterval"><i class="fa fa-clock-o"></i> Poll (ms)</label>
+        <input type="text" id="node-config-input-pollInterval" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-terminator"><i class="fa fa-level-down"></i> Terminator</label>
+        <select id="node-config-input-terminator">
+            <option value="LF">LF</option>
+            <option value="CR">CR</option>
+            <option value="CRLF">CRLF</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/markdown" data-help-name="power-genius-server">
+Power Genius shared connection configuration (PGXL TCP API).
+
+The nodes share one TCP connection to the amplifier. After connecting, the device sends its firmware version
+(with `AUTH` appended when it requires authentication, which is only the case outside the local network and is
+not supported yet). Commands are answered immediately, so the status is read by polling.
+
+### Configuration
+
+: Host (string) : Power Genius host name or IP address.
+
+: Port (integer) : Power Genius API port number. The device uses 9008.
+
+: Auto connect (boolean) : Connect and reconnect automatically (retries every 5 seconds).
+
+: Poll (ms) : How often to read `status` from the device, in milliseconds. 0 disables polling, in which case
+status nodes only get the value read at connect time, and a fresh one on each input message.
+
+: Terminator (LF | CR | CRLF) : What ends each command sent to the device. The API documentation says CR, but
+the sibling Tuner Genius only accepts LF, so LF is the default. Change it if the amplifier answers
+`Invalid command`. Received lines may end with any of them.
+
+Set the Node-RED log level to `trace` to see every line received from the amplifier.
+</script>

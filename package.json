@@ -1,0 +1,59 @@
+{
+  "name": "node-red-contrib-power-genius",
+  "version": "0.1.0",
+  "description": "Power Genius XL Control and Monitoring Nodes",
+  "keywords": [
+    "node-red",
+    "power genius",
+    "pgxl",
+    "4o3a",
+    "flexradio",
+    "ham radio"
+  ],
+  "scripts": {
+    "test": "jest --coverage",
+    "watch": "jest --watch",
+    "preversion": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sm6srw/node-red-contrib-power-genius.git"
+  },
+  "author": "Jorgen Dahl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sm6srw/node-red-contrib-power-genius/issues"
+  },
+  "homepage": "https://github.com/sm6srw/node-red-contrib-power-genius#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "*.js",
+    "*.html",
+    "examples"
+  ],
+  "node-red": {
+    "version": ">=3.1.0",
+    "nodes": {
+      "power-genius-server": "power-genius-server.js",
+      "power-genius-status": "power-genius-status.js",
+      "power-genius-info": "power-genius-info.js",
+      "power-genius-control": "power-genius-control.js"
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "auto-dist-tag": "^2.1.1",
+    "jest": "^28.1.3",
+    "node-red": "^5.0.0",
+    "node-red-node-test-helper": "^0.3.6"
+  },
+  "overrides": {
+    "multer": "^2.5.0",
+    "body-parser": "^1.20.9"
+  },
+  "jest": {
+    "verbose": true
+  }
+}
