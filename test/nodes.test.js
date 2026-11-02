@@ -167,7 +167,7 @@ describe("nodes", () => {
         test("only operate, antenna and command are accepted", async () => {
             const { calls, errors, node } = await load({ action: "" });
             node.receive({ topic: "save", payload: 1 });
-            node.receive({ topic: "meffa", payload: 1 });
+            node.receive({ topic: "ptt", payload: 1 });
             node.receive({ payload: 1 });
             await tick();
             expect(calls).toEqual([]);

@@ -76,8 +76,7 @@ antenna switch version) and anything with the `command` action.
 `operate` comes from another open-source PGXL client ([Log4YM](https://github.com/brianbruff/Log4YM)) and works; it is not
 in the API documentation. `set operate=...` is rejected by the amplifier (error `0x50000015`, unknown command), so the commands
 are bare `name=value`. `antenna=1` is known to exist: the SO2R version answers `0x50000013 - No antenna switch on this hardware`.
-The antenna numbers (assumed 1-3) have not been tried on an amplifier with the switch. Commands for MeFFA and bias are
-not known yet: try them with `command`.
+The antenna numbers (assumed 1-3) have not been tried on an amplifier with the switch.
 
 ## Learning what the amplifier sends
 
