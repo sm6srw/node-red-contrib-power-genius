@@ -80,7 +80,7 @@ The info is collected with the read-only commands `setup read`, `ifconf read`, `
 | `txdelay` | TX delay |
 | `inactivity-timeout` | Inactivity timeout, 0 = off |
 | `authcode` | Authentication code for WAN access. Treat it as a secret: it is part of the whole info object |
-| `ants`, `ant1name`..`ant3name` | Antenna setup: the `ants` setting (0 on the test amplifier) and the antenna names (empty when not set) |
+| `ants`, `ant1name`..`ant3name` | Antenna switch setup: `ants` (0 on the SO2R version, which has no switch) and the names of antennas 1-3 (empty when not set) |
 | `ifconf` | Object with the network configuration: `address`, `netmask`, `gateway`, `dhcp`, `dhcpstatus` and the active `address-status`, `netmask-status`, `gateway-status` |
 | `catradioA`, `catradioB` | Objects with the CAT radio configuration of slice A / B: `type`, `baud`, `parity`, `stopbits`, `civ`, `active` |
 | `flexradioA`, `flexradioB` | Objects with the FlexRadio configuration of slice A / B: `serial`, `txant`, `ptt`, `active` |

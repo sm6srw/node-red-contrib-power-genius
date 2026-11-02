@@ -155,7 +155,16 @@ describe("nodes", () => {
             expect(calls).toEqual(["operate=0", "operate=1"]);
         });
 
-        test("only operate and command are accepted", async () => {
+        test("antenna sends antenna=<n> and only accepts 1-3", async () => {
+            const { calls, errors, node } = await load({ action: "antenna" });
+            for (const payload of [2, "3"]) node.receive({ payload });
+            for (const payload of [0, 4, 1.5, "x", "", null, undefined]) node.receive({ payload });
+            await tick();
+            expect(calls).toEqual(["antenna=2", "antenna=3"]);
+            expect(errors).toHaveLength(7);
+        });
+
+        test("only operate, antenna and command are accepted", async () => {
             const { calls, errors, node } = await load({ action: "" });
             node.receive({ topic: "save", payload: 1 });
             node.receive({ topic: "meffa", payload: 1 });
@@ -163,7 +172,7 @@ describe("nodes", () => {
             await tick();
             expect(calls).toEqual([]);
             expect(errors).toHaveLength(3);
-            expect(errors[0]).toContain("topic must be one of: operate, command");
+            expect(errors[0]).toContain("topic must be one of: operate, antenna, command");
         });
 
         test("command sends the payload as it is and outputs the reply", async () => {

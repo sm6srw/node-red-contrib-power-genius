@@ -132,11 +132,11 @@ The `status` reply is a list of `key=value` pairs. Numeric values are emitted as
 | `fanmode` | Fan mode | e.g. `STANDARD` |
 | `meffa` | MeFFA state | `OFF`, `ACTIVE`; may name a fault such as SWR, TEMP or CURRENT |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
-| `antA` | Antenna connector that input A is physically connected to | 0 or 1 (0 is presumably ANT1 and 1 ANT2; only 0 seen) |
-| `ants` | Antenna routing of the two ports | 0 = A to ANT1 and B to ANT2 (straight), 1 = A to ANT2 and B to ANT1 (crossed); only 0 seen |
+| `antA` | Antenna selected on the antenna switch | Only on the 3-port antenna switch version; 0 on the SO2R version, which has no switch |
+| `ants` | Antenna switch | 0 on the SO2R version (no antenna switch); values on the antenna switch version not seen yet |
 
-Units are taken from the FLEX meter definitions in the API documentation and from observed values. Only 0 has been
-seen for `antA` and `ants`, so what 1 means is not verified on an amplifier.
+Units are taken from the FLEX meter definitions in the API documentation and from observed values. There are two
+hardware versions: SO2R, and one with a 3-port antenna switch. `antA` and `ants` were only seen on the SO2R version.
 
 ### Details
 

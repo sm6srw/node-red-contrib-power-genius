@@ -2,6 +2,13 @@
 // are not documented; the amplifier answers an unknown one with an error.
 const COMMANDS = {
     operate: (payload) => `operate=${parseSwitch(payload)}`,
+    antenna: (payload) => {
+        const n = Number(payload);
+        if (payload === "" || payload === null || !Number.isInteger(n) || n < 1 || n > 3) {
+            throw new Error("payload must be the antenna number, 1-3");
+        }
+        return `antenna=${n}`;
+    },
     command: (payload) => {
         const cmd = String(payload === undefined || payload === null ? "" : payload).trim();
         if (!cmd) throw new Error("payload must be the command to send");

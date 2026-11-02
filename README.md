@@ -13,7 +13,7 @@ Framing: `C<seq>|<command>` request, `R<seq>|<hex>|<message>` reply, `S<n>|<mess
 - **power-genius-server** (config): host, port (default 9008), auto connect and status poll interval (default 1000 ms, 0 = off).
 - **power-genius-status**: emits one status property per node, or *all* as an object. The property is free text so that properties missing from the documentation can be used. Emits `msg.payload` (the value), `msg.topic` (the property name) and `msg.previous`. With `*`, `msg.payload` is the whole status object and `msg.topic` is `status`. By default it only emits when the value changes; an optional deadband suppresses small numeric changes. A start delay (default 1000 ms) holds back the first output after deploy so that downstream nodes, such as dashboard widgets, can initialize. Any input emits the last known value and refreshes from the device.
 - **power-genius-info**: emits the device info once after connecting, either as an object or as a single property. Any input re-reads and emits it.
-- **power-genius-control**: switches `operate` (standby / operate), or sends any command (`command`, the payload is the command) and outputs the reply as `msg.payload`. The action is fixed in the node, or taken from `msg.topic` when the node is set to `msg.topic`; a fixed action always wins. For `operate` the payload is `true`/`false`, `1`/`0` or `"on"`/`"off"`; anything else is rejected and nothing is sent.
+- **power-genius-control**: switches `operate` (standby / operate), selects the `antenna` (1-3, amplifiers with the antenna switch only), or sends any command (`command`, the payload is the command) and outputs the reply as `msg.payload`. The action is fixed in the node, or taken from `msg.topic` when the node is set to `msg.topic`; a fixed action always wins. For `operate` the payload is `true`/`false`, `1`/`0` or `"on"`/`"off"`; anything else is rejected and nothing is sent.
 
 ### Status properties
 
@@ -39,11 +39,12 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 | `fanmode` | Fan mode | e.g. `STANDARD` |
 | `meffa` | MeFFA state | `OFF`, `ACTIVE`; may name a fault such as SWR, TEMP or CURRENT |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
-| `antA` | Antenna connector that input A is physically connected to | 0 or 1 (0 is presumably ANT1 and 1 ANT2; only 0 seen) |
-| `ants` | Antenna routing of the two ports | 0 = A to ANT1 and B to ANT2 (straight), 1 = A to ANT2 and B to ANT1 (crossed); only 0 seen |
+| `antA` | Antenna selected on the antenna switch | Only on the 3-port antenna switch version; 0 on the SO2R version, which has no switch |
+| `ants` | Antenna switch | 0 on the SO2R version (no antenna switch); values on the antenna switch version not seen yet |
 
-Units are taken from the FLEX meter definitions in the API documentation and from observed values. Only 0 has been
-seen for `antA` and `ants`, so what 1 means is not verified on an amplifier. Other properties may show up on other
+Units are taken from the FLEX meter definitions in the API documentation and from observed values. There are two
+hardware versions: SO2R, and one with a 3-port antenna switch. `antA` and `ants` were only seen on the SO2R version.
+Other properties may show up on other
 firmware or setups: use a status node
 with property `*` and a debug node to list them.
 
@@ -61,7 +62,7 @@ Collected with `setup read`, `ifconf read`, `catradio read=A|B` and `flexradio r
 | `txdelay` | TX delay |
 | `inactivity-timeout` | Inactivity timeout, 0 = off |
 | `authcode` | Authentication code for WAN access. Treat it as a secret: it is part of the whole info object |
-| `ants`, `ant1name`..`ant3name` | Antenna setup: the `ants` setting (0 on the test amplifier) and the antenna names (empty when not set) |
+| `ants`, `ant1name`..`ant3name` | Antenna switch setup: `ants` (0 on the SO2R version, which has no switch) and the names of antennas 1-3 (empty when not set) |
 | `ifconf` | Object with the network configuration: `address`, `netmask`, `gateway`, `dhcp`, `dhcpstatus` and the active `address-status`, `netmask-status`, `gateway-status` |
 | `catradioA`, `catradioB` | Objects with the CAT radio configuration of slice A / B: `type`, `baud`, `parity`, `stopbits`, `civ`, `active` |
 | `flexradioA`, `flexradioB` | Objects with the FlexRadio configuration of slice A / B: `serial`, `txant`, `ptt`, `active` |
@@ -69,11 +70,14 @@ Collected with `setup read`, `ifconf read`, `catradio read=A|B` and `flexradio r
 ## Commands used
 
 Read-only: `status`, `setup read`, `ifconf read`, `catradio read={A|B}`, `flexradio read={A|B}`.
-Through the control node: `operate={0|1}` (0 = standby, 1 = operate), and anything with the `command` action.
+Through the control node: `operate={0|1}` (0 = standby, 1 = operate), `antenna={n}` (select the antenna, only on the
+antenna switch version) and anything with the `command` action.
 
 `operate` comes from another open-source PGXL client ([Log4YM](https://github.com/brianbruff/Log4YM)) and works; it is not
 in the API documentation. `set operate=...` is rejected by the amplifier (error `0x50000015`, unknown command), so the commands
-are bare `name=value`. Commands for the antenna routing, MeFFA and bias are not known yet: try them with `command`.
+are bare `name=value`. `antenna=1` is known to exist: the SO2R version answers `0x50000013 - No antenna switch on this hardware`.
+The antenna numbers (assumed 1-3) have not been tried on an amplifier with the switch. Commands for MeFFA and bias are
+not known yet: try them with `command`.
 
 ## Learning what the amplifier sends
 
