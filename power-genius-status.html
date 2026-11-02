@@ -129,7 +129,7 @@ The `status` reply is a list of `key=value` pairs. Numeric values are emitted as
 | `cntfreq` | Frequency counted from the RF | kHz, e.g. 14098; 0 when there is no RF |
 | `cat1freq`, `cat2freq` | Frequency from CAT port 1 / 2 | kHz, 0 = none |
 | `biasA`, `biasB` | Bias setting of input A / B, as `SOURCE_MODE` | e.g. `RADIO_AB`; others seen elsewhere: `AUTO_AAB`, `MANUAL_A` |
-| `fanmode` | Fan mode | e.g. `STANDARD` |
+| `fanmode` | Fan mode | `STANDARD`, `CONTEST`, `BROADCAST` |
 | `meffa` | MeFFA state | `OFF`, `ACTIVE`; may name a fault such as SWR, TEMP or CURRENT |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
 | `antA` | Antenna selected on the antenna switch | Only on the 3-port antenna switch version; 0 on the SO2R version, which has no switch |
