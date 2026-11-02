@@ -118,7 +118,7 @@ The `status` reply is a list of `key=value` pairs. Numeric values are emitted as
 | `bandA`, `bandB` | Band of slice A / B | metres, e.g. `20` |
 | `bsrcA`, `bsrcB` | Source of the band data | e.g. `FLEX` |
 | `bsrcAutoA`, `bsrcAutoB` | Band source selected automatically | 1 = yes, 0 = no |
-| `flexA`, `flexB` | FlexRadio nickname | text |
+| `flexA`, `flexB` | FlexRadio nickname (FLEX mode) | text |
 | `vac` | Mains voltage | V |
 | `vdd` | Supply voltage | V; 0 when not transmitting |
 | `id`, `peakid` | Drain current, and its peak | A; 0 when not transmitting |
@@ -127,13 +127,18 @@ The `status` reply is a list of `key=value` pairs. Numeric values are emitted as
 | `temp` | PA temperature | °C |
 | `hltemp` | Harmonic load temperature | °C |
 | `cntfreq` | Frequency counted from the RF | kHz, e.g. 14098; 0 when there is no RF |
-| `cat1freq`, `cat2freq` | Frequency from CAT port 1 / 2 | kHz, 0 = none |
+| `cat1freq`, `cat2freq` | Frequency from CAT port 1 / 2 (legacy radios with CAT or CI-V) | kHz; 0 in FLEX mode |
 | `biasA`, `biasB` | Bias setting of input A / B, as `SOURCE_MODE` | e.g. `RADIO_AB`; others seen elsewhere: `AUTO_AAB`, `MANUAL_A` |
 | `fanmode` | Fan mode | `STANDARD`, `CONTEST`, `BROADCAST` |
 | `meffa` | MeFFA state | `OFF`, `ACTIVE`; may name a fault such as SWR, TEMP or CURRENT |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
 | `antA` | Antenna selected on the antenna switch | Only on the 3-port antenna switch version; 0 on the SO2R version, which has no switch |
 | `ants` | Antenna switch | 0 on the SO2R version (no antenna switch); values on the antenna switch version not seen yet |
+
+Many status properties are only meaningful for some radio setups. With a FlexRadio (FLEX mode) the amplifier gets the
+band and PTT from the radio over the network, and the properties for legacy radios using CAT or CI-V, such as
+`cat1freq` and `cat2freq`, stay at 0. It is not known which of the remaining properties, for example `bsrcAutoA/B`,
+belong to which mode, since the test amplifier is used with a FlexRadio.
 
 Units are taken from the FLEX meter definitions in the API documentation and from observed values. There are two
 hardware versions: SO2R, and one with a 3-port antenna switch. `antA` and `ants` were only seen on the SO2R version.
