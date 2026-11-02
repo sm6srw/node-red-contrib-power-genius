@@ -18,11 +18,19 @@
             return this.property && this.property !== "*" ? "pg " + this.property : "pg status";
         },
         oneditprepare: function () {
+            const select = $("#node-input-property-select");
+            const input = $("#node-input-property");
+            const known = select.find("option").map(function () { return this.value; }).get();
+            const current = input.val() || "*";
+            select.val(known.includes(current) ? current : "__custom__");
             const sync = () => {
-                const p = $("#node-input-property").val();
+                if (select.val() !== "__custom__") input.val(select.val());
+                input.toggle(select.val() === "__custom__");
+                const p = input.val();
                 $("#node-input-deadband-row").toggle(p !== "*" && p !== "");
             };
-            $("#node-input-property").on("input change", sync);
+            select.on("change", sync);
+            input.on("input change", sync);
             sync();
         },
         oneditsave: function () {
@@ -41,39 +49,48 @@
         <input type="text" id="node-input-server" />
     </div>
     <div class="form-row">
-        <label for="node-input-property"><i class="fa fa-filter"></i> Property</label>
-        <input type="text" id="node-input-property" list="power-genius-properties" style="width:70%" placeholder="* = all, as an object" />
-        <datalist id="power-genius-properties">
-            <option value="*"></option>
-            <option value="state"></option>
-            <option value="bandA"></option>
-            <option value="bandB"></option>
-            <option value="bsrcA"></option>
-            <option value="bsrcB"></option>
-            <option value="bsrcAutoA"></option>
-            <option value="bsrcAutoB"></option>
-            <option value="flexA"></option>
-            <option value="flexB"></option>
-            <option value="vac"></option>
-            <option value="vdd"></option>
-            <option value="id"></option>
-            <option value="peakid"></option>
-            <option value="fwd"></option>
-            <option value="peakfwd"></option>
-            <option value="swr"></option>
-            <option value="temp"></option>
-            <option value="hltemp"></option>
-            <option value="cntfreq"></option>
-            <option value="cat1freq"></option>
-            <option value="cat2freq"></option>
-            <option value="biasA"></option>
-            <option value="biasB"></option>
-            <option value="fanmode"></option>
-            <option value="meffa"></option>
-            <option value="unkey"></option>
-            <option value="antA"></option>
-            <option value="ants"></option>
-        </datalist>
+        <label for="node-input-property-select"><i class="fa fa-filter"></i> Property</label>
+        <select id="node-input-property-select" style="width:70%">
+            <option value="*">(all, as an object)</option>
+            <optgroup label="Device">
+                <option value="state">state</option>
+                <option value="fanmode">fanmode</option>
+                <option value="meffa">meffa</option>
+                <option value="unkey">unkey</option>
+            </optgroup>
+            <optgroup label="Power">
+                <option value="fwd">fwd</option>
+                <option value="peakfwd">peakfwd</option>
+                <option value="swr">swr</option>
+                <option value="vac">vac</option>
+                <option value="vdd">vdd</option>
+                <option value="id">id</option>
+                <option value="peakid">peakid</option>
+                <option value="temp">temp</option>
+                <option value="hltemp">hltemp</option>
+            </optgroup>
+            <optgroup label="Band and radio">
+                <option value="bandA">bandA</option>
+                <option value="bandB">bandB</option>
+                <option value="bsrcA">bsrcA</option>
+                <option value="bsrcB">bsrcB</option>
+                <option value="bsrcAutoA">bsrcAutoA</option>
+                <option value="bsrcAutoB">bsrcAutoB</option>
+                <option value="flexA">flexA</option>
+                <option value="flexB">flexB</option>
+                <option value="cntfreq">cntfreq</option>
+                <option value="cat1freq">cat1freq</option>
+                <option value="cat2freq">cat2freq</option>
+                <option value="biasA">biasA</option>
+                <option value="biasB">biasB</option>
+            </optgroup>
+            <optgroup label="Antenna switch">
+                <option value="antA">antA</option>
+                <option value="ants">ants</option>
+            </optgroup>
+            <option value="__custom__">other (type the name)...</option>
+        </select>
+        <input type="text" id="node-input-property" style="display:none; margin-top:5px; width:70%; margin-left:105px" />
     </div>
     <div class="form-row">
         <label for="node-input-onlyChange">&nbsp;</label>
@@ -95,8 +112,8 @@
 <script type="text/markdown" data-help-name="power-genius-status">
 Emits one Power Genius XL status property, or the whole status, when it changes.
 
-Use one node per property you care about, for example `fwd`, `swr` or `state`. The property is free text, so
-anything the amplifier reports can be used; leave it as `*` to get the whole object.
+Use one node per property you care about, for example `fwd`, `swr` or `state`. Choose *other* in the list to type
+the name of any property the amplifier reports; leave it as *(all)* to get the whole object.
 
 ### Input
 

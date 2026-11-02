@@ -15,6 +15,19 @@
             if (this.name) return this.name;
             return this.property && this.property !== "*" ? "pg " + this.property : "pg info";
         },
+        oneditprepare: function () {
+            const select = $("#node-input-property-select");
+            const input = $("#node-input-property");
+            const known = select.find("option").map(function () { return this.value; }).get();
+            const current = input.val() || "*";
+            select.val(known.includes(current) ? current : "__custom__");
+            const sync = () => {
+                if (select.val() !== "__custom__") input.val(select.val());
+                input.toggle(select.val() === "__custom__");
+            };
+            select.on("change", sync);
+            sync();
+        },
         oneditsave: function () {
             if (!$("#node-input-property").val().trim()) $("#node-input-property").val("*");
         },
@@ -31,20 +44,21 @@
         <input type="text" id="node-input-server" />
     </div>
     <div class="form-row">
-        <label for="node-input-property"><i class="fa fa-filter"></i> Property</label>
-        <input type="text" id="node-input-property" list="power-genius-info-properties" style="width:70%" placeholder="* = all, as an object" />
-        <datalist id="power-genius-info-properties">
-            <option value="*"></option>
-            <option value="name"></option>
-            <option value="nickname"></option>
-            <option value="firmware"></option>
-            <option value="authRequired"></option>
-            <option value="ifconf"></option>
-            <option value="catradioA"></option>
-            <option value="catradioB"></option>
-            <option value="flexradioA"></option>
-            <option value="flexradioB"></option>
-        </datalist>
+        <label for="node-input-property-select"><i class="fa fa-filter"></i> Property</label>
+        <select id="node-input-property-select" style="width:70%">
+            <option value="*">(all, as an object)</option>
+            <option value="name">name</option>
+            <option value="nickname">nickname</option>
+            <option value="firmware">firmware</option>
+            <option value="authRequired">authRequired</option>
+            <option value="ifconf">ifconf</option>
+            <option value="catradioA">catradioA</option>
+            <option value="catradioB">catradioB</option>
+            <option value="flexradioA">flexradioA</option>
+            <option value="flexradioB">flexradioB</option>
+            <option value="__custom__">other (type the name)...</option>
+        </select>
+        <input type="text" id="node-input-property" style="display:none; margin-top:5px; width:70%; margin-left:105px" />
     </div>
     <div class="form-row">
         <label for="node-input-startDelay"><i class="fa fa-hourglass-start"></i> Start delay</label>
