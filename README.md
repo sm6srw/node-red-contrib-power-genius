@@ -39,11 +39,11 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 | `fanmode` | Fan mode | e.g. `STANDARD` |
 | `meffa` | MeFFA state | `OFF`, `ACTIVE` |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
-| `antA` | Antenna connector that input A is routed to | 1 = ANT1, 2 = ANT2; 0 was seen on the test amplifier, probably none selected |
-| `ants` | Antenna routing of the two ports | 0 = A to ANT1 and B to ANT2 (straight), 1 = A to ANT2 and B to ANT1 (crossed) |
+| `antA` | Antenna connector that input A is physically connected to | 0 or 1 (0 is presumably ANT1 and 1 ANT2; only 0 seen) |
+| `ants` | Antenna routing of the two ports | 0 = A to ANT1 and B to ANT2 (straight), 1 = A to ANT2 and B to ANT1 (crossed); only 0 seen |
 
 Units are taken from the FLEX meter definitions in the API documentation and from observed values. Only 0 has been
-seen for `antA` and `ants`; the other values are not verified on an amplifier. Other properties may show up on other
+seen for `antA` and `ants`, so what 1 means is not verified on an amplifier. Other properties may show up on other
 firmware or setups: use a status node
 with property `*` and a debug node to list them.
 
