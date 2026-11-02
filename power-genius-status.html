@@ -46,7 +46,33 @@
         <datalist id="power-genius-properties">
             <option value="*"></option>
             <option value="state"></option>
+            <option value="bandA"></option>
+            <option value="bandB"></option>
+            <option value="bsrcA"></option>
+            <option value="bsrcB"></option>
+            <option value="bsrcAutoA"></option>
+            <option value="bsrcAutoB"></option>
+            <option value="flexA"></option>
+            <option value="flexB"></option>
+            <option value="vac"></option>
+            <option value="vdd"></option>
+            <option value="id"></option>
+            <option value="peakid"></option>
+            <option value="fwd"></option>
+            <option value="peakfwd"></option>
+            <option value="swr"></option>
+            <option value="temp"></option>
+            <option value="hltemp"></option>
+            <option value="cntfreq"></option>
+            <option value="cat1freq"></option>
+            <option value="cat2freq"></option>
+            <option value="biasA"></option>
+            <option value="biasB"></option>
+            <option value="fanmode"></option>
             <option value="meffa"></option>
+            <option value="unkey"></option>
+            <option value="antA"></option>
+            <option value="ants"></option>
         </datalist>
     </div>
     <div class="form-row">
@@ -69,8 +95,8 @@
 <script type="text/markdown" data-help-name="power-genius-status">
 Emits one Power Genius XL status property, or the whole status, when it changes.
 
-Use one node per property you care about. The property is free text, because the amplifier reports more
-than the API documentation lists: leave it as `*` and look at the whole object to see what your amplifier sends.
+Use one node per property you care about, for example `fwd`, `swr` or `state`. The property is free text, so
+anything the amplifier reports can be used; leave it as `*` to get the whole object.
 
 ### Input
 
@@ -86,12 +112,31 @@ Any message emits the last known value, even if unchanged, and refreshes the sta
 
 The `status` reply is a list of `key=value` pairs. Numeric values are emitted as numbers, everything else as text.
 
-| Property | Meaning | Values |
+| Property | Meaning | Values / unit |
 |---|---|---|
-| `state` | Amplifier state | for example `STANDBY`, or `REBOOT` after a save |
-| `meffa` | MeFFA state | for example `OFF` |
+| `state` | Amplifier state | `STANDBY`, `TRANSMIT_A`, `TRANSMIT_B`; `REBOOT` is sent after `save` |
+| `bandA`, `bandB` | Band of slice A / B | metres, e.g. `20` |
+| `bsrcA`, `bsrcB` | Source of the band data | e.g. `FLEX` |
+| `bsrcAutoA`, `bsrcAutoB` | Band source selected automatically | 1 = yes, 0 = no |
+| `flexA`, `flexB` | FlexRadio nickname | text |
+| `vac` | Mains voltage | V |
+| `vdd` | Supply voltage | V |
+| `id`, `peakid` | Drain current, and its peak | A |
+| `fwd`, `peakfwd` | Forward power, and its peak | dBm |
+| `swr` | Return loss | dB (negative; the FLEX `RL` meter) |
+| `temp` | PA temperature | °C |
+| `hltemp` | Second temperature sensor | °C |
+| `cntfreq` | Frequency counted from the RF | kHz |
+| `cat1freq`, `cat2freq` | Frequency from CAT port 1 / 2 | kHz, 0 = none |
+| `biasA`, `biasB` | Bias source | e.g. `RADIO_AB` |
+| `fanmode` | Fan mode | e.g. `STANDARD` |
+| `meffa` | MeFFA state | `OFF`, `ACTIVE` |
+| `unkey` | Unkey indication | 0 / 1 |
+| `antA` | Antenna in use (with an Antenna Genius) | number, 0 = none |
+| `ants` | Antenna Genius connected | 0 / 1 |
 
-Other properties are reported by the device but not documented.
+Units are taken from the FLEX meter definitions in the API documentation and from observed values; the meaning of
+`hltemp`, `unkey` and `ants` is a guess.
 
 ### Details
 

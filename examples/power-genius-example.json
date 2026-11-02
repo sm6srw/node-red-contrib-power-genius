@@ -12,8 +12,7 @@
         "host": "192.168.1.100",
         "port": 9008,
         "autoConnect": true,
-        "pollInterval": 1000,
-        "terminator": "LF"
+        "pollInterval": 1000
     },
     {
         "id": "pg-comment-setup",

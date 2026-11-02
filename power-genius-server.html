@@ -6,7 +6,6 @@
             port: { value: 9008, required: true, validate: RED.validators.number() },
             autoConnect: { value: true },
             pollInterval: { value: 1000, validate: RED.validators.number() },
-            terminator: { value: "LF" },
         },
         label: function () {
             return "power genius at " + this.host + ":" + this.port;
@@ -31,14 +30,6 @@
         <label for="node-config-input-pollInterval"><i class="fa fa-clock-o"></i> Poll (ms)</label>
         <input type="text" id="node-config-input-pollInterval" />
     </div>
-    <div class="form-row">
-        <label for="node-config-input-terminator"><i class="fa fa-level-down"></i> Terminator</label>
-        <select id="node-config-input-terminator">
-            <option value="LF">LF</option>
-            <option value="CR">CR</option>
-            <option value="CRLF">CRLF</option>
-        </select>
-    </div>
 </script>
 
 <script type="text/markdown" data-help-name="power-genius-server">
@@ -58,10 +49,6 @@ not supported yet). Commands are answered immediately, so the status is read by 
 
 : Poll (ms) : How often to read `status` from the device, in milliseconds. 0 disables polling, in which case
 status nodes only get the value read at connect time, and a fresh one on each input message.
-
-: Terminator (LF | CR | CRLF) : What ends each command sent to the device. The API documentation says CR, but
-the sibling Tuner Genius only accepts LF, so LF is the default. Change it if the amplifier answers
-`Invalid command`. Received lines may end with any of them.
 
 Set the Node-RED log level to `trace` to see every line received from the amplifier.
 </script>

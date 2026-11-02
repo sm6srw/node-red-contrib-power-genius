@@ -68,18 +68,22 @@ Any message re-reads the info from the device and emits it.
 ### Details
 
 The info is collected with the read-only commands `setup read`, `ifconf read`, `catradio read=A|B` and
-`flexradio read=A|B`. The API documentation does not list the fields in the replies, so the node keeps whatever
-the device sends. Use `*` to see them all.
+`flexradio read=A|B`; each reply is parsed as `key=value` pairs. Use `*` to get everything.
 
 | Item | Meaning |
 |---|---|
-| `name` | Device name with spaces (the `nickname` with `_` replaced by a space) |
+| `name` | Device name (the `nickname`, with `_` replaced by a space) |
+| `nickname` | Device name as reported |
 | `firmware` | Firmware version, from the banner the device sends on connect |
 | `authRequired` | `true` when the device asked for authentication (only outside the local network; not supported yet) |
-| `nickname`, ... | Fields of `setup read`, such as nickname, fan mode, MeFFA state and LED intensity |
-| `ifconf` | Object with the network configuration (address, netmask, gateway, DHCP) |
-| `catradioA`, `catradioB` | Objects with the CAT radio configuration of slice A / B |
-| `flexradioA`, `flexradioB` | Objects with the FlexRadio configuration of slice A / B |
+| `ledintens` | LED intensity |
+| `txdelay` | TX delay |
+| `inactivity-timeout` | Inactivity timeout, 0 = off |
+| `authcode` | Authentication code for WAN access. Treat it as a secret: it is part of the whole info object |
+| `ants`, `ant1name`..`ant3name` | Antenna Genius integration: number of antennas and their names |
+| `ifconf` | Object with the network configuration: `address`, `netmask`, `gateway`, `dhcp`, `dhcpstatus` and the active `address-status`, `netmask-status`, `gateway-status` |
+| `catradioA`, `catradioB` | Objects with the CAT radio configuration of slice A / B: `type`, `baud`, `parity`, `stopbits`, `civ`, `active` |
+| `flexradioA`, `flexradioB` | Objects with the FlexRadio configuration of slice A / B: `serial`, `txant`, `ptt`, `active` |
 
 The info is emitted once after the connection is established, and again after every reconnect.
 The *Start delay* holds back output for that many milliseconds after the flow is deployed,

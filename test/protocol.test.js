@@ -12,13 +12,10 @@ describe("GeniusPGProtocol", () => {
         expect(parseBanner("V3.8.8")).toEqual({ firmware: "3.8.8", authRequired: false });
     });
 
-    test("terminator defaults to LF and is configurable", () => {
+    test("commands end with a bare LF", () => {
         const written = [];
-        const socket = { write: (d) => written.push(d) };
-        new GeniusPGProtocol(socket).sendCommand("status");
-        new GeniusPGProtocol(socket, "CR").sendCommand("status");
-        new GeniusPGProtocol(socket, "CRLF").sendCommand("status");
-        expect(written).toEqual(["C1|status\n", "C1|status\r", "C1|status\r\n"]);
+        new GeniusPGProtocol({ write: (d) => written.push(d) }).sendCommand("status");
+        expect(written).toEqual(["C1|status\n"]);
     });
 
     test("banner, command/reply and status", async () => {

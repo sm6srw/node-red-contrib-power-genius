@@ -1,16 +1,12 @@
 // Client for the PowerGenius XL line based API (TCP port 9008).
 //   banner:    V<a.b.c>[ AUTH]\r\n   (sent once on connect)
-//   request:   C<seq>|<command><terminator>   (seq 1-255; the documentation says CR, LF is the default here
-//              because the sibling Tuner Genius rejects a trailing CR, see the "terminator" option)
+//   request:   C<seq>|<command>\n   (seq 1-255; the documentation says CR, but a bare LF is what the device works with)
 //   reply:     R<seq>|<hex result>|<message>
 //   status:    S<n>|<message>   (asynchronous, for example "S|state=REBOOT")
 // The documentation is incomplete, so everything here is tolerant: unknown lines are passed on, never dropped.
-const TERMINATORS = { LF: "\n", CR: "\r", CRLF: "\r\n" };
-
 class GeniusPGProtocol {
-    constructor(socket, terminator = "LF") {
+    constructor(socket) {
         this.socket = socket;
-        this.terminator = TERMINATORS[terminator] || TERMINATORS.LF;
         this.seq = 0;
         this.pending = new Map();
         this.lineBuffer = "";
@@ -90,7 +86,7 @@ class GeniusPGProtocol {
                 entry.reject = (e) => { clearTimeout(timer); reject(e); };
             }
             this.pending.set(seq, entry);
-            this.socket.write(`C${seq}|${cmd}${this.terminator}`);
+            this.socket.write(`C${seq}|${cmd}\n`);
         });
     }
 
@@ -137,4 +133,3 @@ const parseBanner = (line) => {
 exports.GeniusPGProtocol = GeniusPGProtocol;
 exports.parseKeyValues = parseKeyValues;
 exports.parseBanner = parseBanner;
-exports.TERMINATORS = TERMINATORS;

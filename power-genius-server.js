@@ -24,7 +24,6 @@ module.exports = (RED) => {
             this.port = n.port;
             this.autoConnect = n.autoConnect || false;
             this.pollInterval = Math.max(parseInt(n.pollInterval, 10) || 0, 0);
-            this.terminator = n.terminator || "LF";
             this.poller = null;
 
             this.status = {};
@@ -148,7 +147,7 @@ module.exports = (RED) => {
         }
 
         async _setup() {
-            const protocol = new GeniusPGProtocol(this.client, this.terminator);
+            const protocol = new GeniusPGProtocol(this.client);
             this._protocol = protocol;
             this._dataHandler = (chunk) => protocol.handleData(chunk);
 
