@@ -32,7 +32,7 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 | `fwd`, `peakfwd` | Forward power, and its peak | dBm; `fwd` is 30 (the meter minimum) when there is no RF, `peakfwd` keeps the last peak |
 | `swr` | Return loss | dB (negative, e.g. -18; the FLEX `RL` meter); -60 when there is no RF |
 | `temp` | PA temperature | °C |
-| `hltemp` | Second temperature sensor | °C |
+| `hltemp` | Harmonic load temperature | °C |
 | `cntfreq` | Frequency counted from the RF | kHz, e.g. 14098; 0 when there is no RF |
 | `cat1freq`, `cat2freq` | Frequency from CAT port 1 / 2 | kHz, 0 = none |
 | `biasA`, `biasB` | Bias source | e.g. `RADIO_AB` |
@@ -43,7 +43,7 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 | `ants` | Antenna Genius connected | 0 / 1 |
 
 Units are taken from the FLEX meter definitions in the API documentation and from observed values; the meaning of
-`hltemp`, `unkey` and `ants` is a guess. Other properties may show up on other firmware or setups: use a status node
+`unkey` and `ants` is a guess. Other properties may show up on other firmware or setups: use a status node
 with property `*` and a debug node to list them.
 
 ### Info properties
