@@ -38,12 +38,12 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 | `biasA`, `biasB` | Bias source | e.g. `RADIO_AB` |
 | `fanmode` | Fan mode | e.g. `STANDARD` |
 | `meffa` | MeFFA state | `OFF`, `ACTIVE` |
-| `unkey` | Unkey indication | 0 / 1 |
+| `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
 | `antA` | Antenna in use (with an Antenna Genius) | number, 0 = none |
 | `ants` | Antenna Genius connected | 0 / 1 |
 
 Units are taken from the FLEX meter definitions in the API documentation and from observed values; the meaning of
-`unkey` and `ants` is a guess. Other properties may show up on other firmware or setups: use a status node
+`ants` is a guess. Other properties may show up on other firmware or setups: use a status node
 with property `*` and a debug node to list them.
 
 ### Info properties
