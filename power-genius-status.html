@@ -133,7 +133,7 @@ The `status` reply is a list of `key=value` pairs. Numeric values are emitted as
 | `meffa` | MeFFA state | `OFF`, `ACTIVE` |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
 | `antA` | Antenna in use (with an Antenna Genius) | number, 0 = none |
-| `ants` | Antenna Genius connected | 0 / 1 |
+| `ants` | Antenna routing of the two ports | 0 = A to ANT1 and B to ANT2 (straight), 1 = A to ANT2 and B to ANT1 (crossed) |
 
 Units are taken from the FLEX meter definitions in the API documentation and from observed values; the meaning of
 `ants` is a guess.

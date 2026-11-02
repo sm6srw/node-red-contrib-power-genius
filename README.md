@@ -40,10 +40,10 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 | `meffa` | MeFFA state | `OFF`, `ACTIVE` |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
 | `antA` | Antenna in use (with an Antenna Genius) | number, 0 = none |
-| `ants` | Antenna Genius connected | 0 / 1 |
+| `ants` | Antenna routing of the two ports | 0 = A to ANT1 and B to ANT2 (straight), 1 = A to ANT2 and B to ANT1 (crossed) |
 
 Units are taken from the FLEX meter definitions in the API documentation and from observed values; the meaning of
-`ants` is a guess. Other properties may show up on other firmware or setups: use a status node
+`antA` is a guess. Other properties may show up on other firmware or setups: use a status node
 with property `*` and a debug node to list them.
 
 ### Info properties
