@@ -13,7 +13,7 @@ Framing: `C<seq>|<command>` request, `R<seq>|<hex>|<message>` reply, `S<n>|<mess
 - **power-genius-server** (config): host, port (default 9008), auto connect and status poll interval (default 1000 ms, 0 = off).
 - **power-genius-status**: emits one status property per node, or *all* as an object. The property is free text so that properties missing from the documentation can be used. Emits `msg.payload` (the value), `msg.topic` (the property name) and `msg.previous`. With `*`, `msg.payload` is the whole status object and `msg.topic` is `status`. By default it only emits when the value changes; an optional deadband suppresses small numeric changes. A start delay (default 1000 ms) holds back the first output after deploy so that downstream nodes, such as dashboard widgets, can initialize. Any input emits the last known value and refreshes from the device.
 - **power-genius-info**: emits the device info once after connecting, either as an object or as a single property. Any input re-reads and emits it.
-- **power-genius-control**: sends a raw command (`command`, payload is the command) or saves the configuration (`save`, which reboots the amplifier). The reply is output as `msg.payload`. The action is fixed in the node, or taken from `msg.topic` when the node is set to `msg.topic`; a fixed action always wins.
+- **power-genius-control**: switches `operate` (standby / operate), `antenna` (port routing), `meffa` and `bias` on or off. The action is fixed in the node, or taken from `msg.topic` when the node is set to `msg.topic`; a fixed action always wins. The payload is `true`/`false`, `1`/`0` or `"on"`/`"off"`; anything else is rejected and nothing is sent.
 
 ### Status properties
 
@@ -21,7 +21,7 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 
 | Property | Meaning | Values / unit |
 |---|---|---|
-| `state` | Amplifier state | `IDLE`, `STANDBY`, `TRANSMIT_A`, `TRANSMIT_B`; `REBOOT` is sent after `save` |
+| `state` | Amplifier state | `IDLE`, `STANDBY`, `TRANSMIT_A`, `TRANSMIT_B` |
 | `bandA`, `bandB` | Band of slice A / B | metres, e.g. `20` |
 | `bsrcA`, `bsrcB` | Source of the band data | e.g. `FLEX` |
 | `bsrcAutoA`, `bsrcAutoB` | Band source selected automatically | 1 = yes, 0 = no |
@@ -69,12 +69,21 @@ Collected with `setup read`, `ifconf read`, `catradio read=A|B` and `flexradio r
 ## Commands used
 
 Read-only: `status`, `setup read`, `ifconf read`, `catradio read={A|B}`, `flexradio read={A|B}`.
-Through the control node: any command, and `save`.
+Through the control node: `set operate={0|1}`, `set antenna={0|1}`, `set meffa={0|1}` and `set bias={0|1}`.
+
+| Action | 0 | 1 |
+|---|---|---|
+| `operate` | Standby | Operate |
+| `antenna` | Straight routing of the ports (status `ants` = 0) | Crossed routing (status `ants` = 1) |
+| `meffa` | MeFFA off | MeFFA on |
+| `bias` | Bias profile 0 | Bias profile 1 |
+
+These `set` commands are not in the API documentation and have not been verified on an amplifier yet. A command the
+amplifier rejects is reported as an error on the control node.
 
 ## Learning what the amplifier sends
 
 - Set the Node-RED log level to `trace` to log every line received from the amplifier.
-- Use a **power-genius-control** node with action `command` to try commands and see the replies.
 
 Commands are sent as `C<seq>|<command>` terminated by a bare LF; the documentation says CR, but LF works.
 

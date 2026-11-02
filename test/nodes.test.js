@@ -20,6 +20,7 @@ const startFakeAmplifier = () => new Promise((resolve) => {
         "catradio read=A": "ampslice=A active=0 type=None",
         "flexradio read=A": "serial=1718-9765-6601-2203 txant=ANT1 ptt=LAN active=1",
         "status": "state=STANDBY temp=31.5 meffa=OFF",
+        "set operate=1": "",
     };
     const srv = net.createServer((socket) => {
         socket.write("V3.8.8\r\n");
@@ -79,7 +80,7 @@ describe("nodes", () => {
                 { id: "s", type: "power-genius-server", host: "127.0.0.1", port: amp.port, autoConnect: true, pollInterval: 0 },
                 { id: "st", type: "power-genius-status", server: "s", property: "state", startDelay: 0, wires: [["h"]] },
                 { id: "i", type: "power-genius-info", server: "s", property: "ifconf", startDelay: 0, wires: [["h"]] },
-                { id: "c", type: "power-genius-control", server: "s", action: "command", wires: [["h"]] },
+                { id: "c", type: "power-genius-control", server: "s", action: "operate" },
                 { id: "h", type: "helper" },
             ]);
             const out = [];
@@ -102,25 +103,21 @@ describe("nodes", () => {
             );
         });
 
-        test("control node sends a raw command and outputs the reply", async () => {
-            const { out } = await load();
-            out.length = 0;
-            helper.getNode("c").receive({ payload: "setup read" });
+        test("control node sends the set command to the amplifier", async () => {
+            await load();
+            amp.received.length = 0;
+            helper.getNode("c").receive({ payload: true });
             await tick(100);
-            expect(out).toHaveLength(1);
-            expect(out[0].topic).toBe("command");
-            expect(out[0].payload).toBe("nickname=My_PGXL fan=NORMAL meffa=OFF led=5");
+            expect(amp.received).toEqual(["set operate=1"]);
         });
 
-        test("an unsupported command is reported as an error", async () => {
-            const { out } = await load();
-            out.length = 0;
+        test("a command the amplifier rejects is reported as an error", async () => {
+            await load();
             const c = helper.getNode("c");
             const errors = [];
             c.on("call:error", (call) => errors.push(call.args[0]));
-            c.receive({ payload: "nonsense" });
+            c.receive({ topic: "bias", payload: 1 });
             await tick(100);
-            expect(out).toHaveLength(0);
             expect(String(errors[0])).toContain("Command error");
         });
     });
@@ -134,22 +131,45 @@ describe("nodes", () => {
             const srv = helper.getNode("s");
             const calls = [];
             srv.command = (cmd) => { calls.push(cmd); return Promise.resolve(""); };
-            srv.save = () => { calls.push("save"); return Promise.resolve(""); };
-            return { calls, node: helper.getNode("c") };
+            const node = helper.getNode("c");
+            const errors = [];
+            node.on("call:error", (call) => errors.push(String(call.args[0])));
+            return { calls, errors, node };
         };
 
         test("a fixed action wins over msg.topic", async () => {
-            const { calls, node } = await load({ action: "command" });
-            node.receive({ topic: "save", payload: "ifconf read" });
+            const { calls, node } = await load({ action: "operate" });
+            node.receive({ topic: "meffa", payload: 1 });
             await tick();
-            expect(calls).toEqual(["ifconf read"]);
+            expect(calls).toEqual(["set operate=1"]);
         });
 
         test("msg.topic is used when no action is fixed", async () => {
             const { calls, node } = await load({ action: "" });
-            node.receive({ topic: "save" });
+            node.receive({ topic: "antenna", payload: "off" });
+            node.receive({ topic: "Meffa", payload: true });
+            node.receive({ topic: "bias", payload: "0" });
             await tick();
-            expect(calls).toEqual(["save"]);
+            expect(calls).toEqual(["set antenna=0", "set meffa=1", "set bias=0"]);
+        });
+
+        test("only operate, antenna, meffa and bias are accepted", async () => {
+            const { calls, errors, node } = await load({ action: "" });
+            node.receive({ topic: "save", payload: 1 });
+            node.receive({ topic: "command", payload: "setup read" });
+            node.receive({ payload: 1 });
+            await tick();
+            expect(calls).toEqual([]);
+            expect(errors).toHaveLength(3);
+            expect(errors[0]).toContain("operate, antenna, meffa, bias");
+        });
+
+        test("a payload that is not a clear on/off is rejected and nothing is sent", async () => {
+            const { calls, errors, node } = await load({ action: "operate" });
+            for (const payload of [2, "maybe", undefined, null, ""]) node.receive({ payload });
+            await tick();
+            expect(calls).toEqual([]);
+            expect(errors).toHaveLength(5);
         });
     });
 

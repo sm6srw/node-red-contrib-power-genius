@@ -1,3 +1,24 @@
+const ACTIONS = ["operate", "antenna", "meffa", "bias"];
+
+// true/false, 1/0, "1"/"0" and "on"/"off" (any case). Anything else is rejected, so that a stray payload
+// can never switch the amplifier by accident.
+const parseSwitch = (payload) => {
+    if (payload === true || payload === 1) return 1;
+    if (payload === false || payload === 0) return 0;
+    switch (String(payload).trim().toLowerCase()) {
+        case "1":
+        case "on":
+        case "true":
+            return 1;
+        case "0":
+        case "off":
+        case "false":
+            return 0;
+        default:
+            throw new Error("payload must be true/false, 1/0 or on/off");
+    }
+};
+
 module.exports = (RED) => {
     class PowerGeniusControl {
         constructor(config) {
@@ -27,21 +48,10 @@ module.exports = (RED) => {
             this.on("input", async (msg, send, done) => {
                 const action = String(config.action || msg.topic || "").toLowerCase();
                 try {
-                    let reply;
-                    switch (action) {
-                        case "command": {
-                            const cmd = String(msg.payload === undefined ? "" : msg.payload).trim();
-                            if (!cmd) throw new Error("payload must be the command to send");
-                            reply = await this.server.command(cmd);
-                            break;
-                        }
-                        case "save":
-                            reply = await this.server.save();
-                            break;
-                        default:
-                            throw new Error("topic must be one of: command, save");
+                    if (!ACTIONS.includes(action)) {
+                        throw new Error(`topic must be one of: ${ACTIONS.join(", ")}`);
                     }
-                    send({ ...msg, topic: action, payload: reply });
+                    await this.server.command(`set ${action}=${parseSwitch(msg.payload)}`);
                     if (done) done();
                 } catch (err) {
                     this.status({ fill: "red", shape: "ring", text: err.message });

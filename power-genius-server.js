@@ -179,17 +179,12 @@ module.exports = (RED) => {
             this.updatesEventEmitter.emit("status", { ...this.status });
         }
 
-        // Send a raw command to the amplifier. Resolves with the reply message.
+        // Send a command to the amplifier. Resolves with the reply message.
         command(cmd) {
             if (!this._protocol) {
                 return Promise.reject(new Error("not connected"));
             }
             return this._protocol.sendCommand(cmd, 5000);
-        }
-
-        // Writes the configuration. The amplifier reboots afterwards.
-        save() {
-            return this.command("save");
         }
 
         connect() {
