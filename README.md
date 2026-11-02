@@ -39,11 +39,12 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 | `fanmode` | Fan mode | e.g. `STANDARD` |
 | `meffa` | MeFFA state | `OFF`, `ACTIVE` |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
-| `antA` | Antenna in use (with an Antenna Genius) | number, 0 = none |
+| `antA` | Antenna connector that input A is routed to | 1 = ANT1, 2 = ANT2; 0 was seen on the test amplifier, probably none selected |
 | `ants` | Antenna routing of the two ports | 0 = A to ANT1 and B to ANT2 (straight), 1 = A to ANT2 and B to ANT1 (crossed) |
 
-Units are taken from the FLEX meter definitions in the API documentation and from observed values; the meaning of
-`antA` is a guess. Other properties may show up on other firmware or setups: use a status node
+Units are taken from the FLEX meter definitions in the API documentation and from observed values. Only 0 has been
+seen for `antA` and `ants`; the other values are not verified on an amplifier. Other properties may show up on other
+firmware or setups: use a status node
 with property `*` and a debug node to list them.
 
 ### Info properties
@@ -60,7 +61,7 @@ Collected with `setup read`, `ifconf read`, `catradio read=A|B` and `flexradio r
 | `txdelay` | TX delay |
 | `inactivity-timeout` | Inactivity timeout, 0 = off |
 | `authcode` | Authentication code for WAN access. Treat it as a secret: it is part of the whole info object |
-| `ants`, `ant1name`..`ant3name` | Antenna Genius integration: number of antennas and their names |
+| `ants`, `ant1name`..`ant3name` | Antenna setup: the `ants` setting (0 on the test amplifier) and the antenna names (empty when not set) |
 | `ifconf` | Object with the network configuration: `address`, `netmask`, `gateway`, `dhcp`, `dhcpstatus` and the active `address-status`, `netmask-status`, `gateway-status` |
 | `catradioA`, `catradioB` | Objects with the CAT radio configuration of slice A / B: `type`, `baud`, `parity`, `stopbits`, `civ`, `active` |
 | `flexradioA`, `flexradioB` | Objects with the FlexRadio configuration of slice A / B: `serial`, `txant`, `ptt`, `active` |
