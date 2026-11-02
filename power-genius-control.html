@@ -8,7 +8,7 @@
             action: { value: "" },
         },
         inputs: 1,
-        outputs: 0,
+        outputs: 1,
         icon: "bridge.svg",
         label: function () {
             return this.name || "pg control";
@@ -30,6 +30,7 @@
         <select id="node-input-action">
             <option value="">msg.topic</option>
             <option value="operate">operate</option>
+            <option value="command">command</option>
         </select>
     </div>
 </script>
@@ -39,14 +40,26 @@ Controls the Power Genius XL.
 
 ### Input
 
-: topic (string) : `operate`. Only used when the node's Action is set to `msg.topic`; a fixed action in the node always takes precedence.
+: topic (string) : `operate` or `command`. Only used when the node's Action is set to `msg.topic`; a fixed action in the node always takes precedence.
 
-: payload (boolean|number|string) : `true`, `1`, `"1"` or `"on"` for 1, and `false`, `0`, `"0"` or `"off"` for 0. Anything else is an error and nothing is sent.
+: payload (boolean|number|string) : Depends on the action:
 
-| Action | Command sent | 0 | 1 |
-|---|---|---|---|
-| `operate` | `operate=<0\|1>` | Standby | Operate |
+| Action | Payload | Command sent |
+|---|---|---|
+| `operate` | `true`, `1`, `"1"` or `"on"` for operate, `false`, `0`, `"0"` or `"off"` for standby. Anything else is an error and nothing is sent. | `operate=<1\|0>` |
+| `command` | The command, on a single line, for example `setup read` or `ping` | The payload as it is |
 
-A failed command is reported as an error on the node. The effect shows up in the status `state`
-(`STANDBY`, or `IDLE` when operating).
+### Output
+
+: topic (string) : The action.
+: payload (string) : The reply message from the amplifier, for example `key=value key=value ...`. Empty when the command has no reply message.
+
+A failed command is reported as an error on the node, with the result code from the amplifier. For example
+`0x50000015` means that the amplifier does not know the command.
+
+### Details
+
+`command` is for trying out commands that the API documentation does not cover. Commands that change the
+configuration, such as `ifconf`, `catradio` and `flexradio`, take effect after `save`, which reboots the amplifier. Use with care.
+The effect of `operate` shows up in the status `state` (`STANDBY`, or `IDLE` when operating).
 </script>

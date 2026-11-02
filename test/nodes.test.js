@@ -123,18 +123,21 @@ describe("nodes", () => {
     });
 
     describe("control node", () => {
-        const load = async (cfg) => {
+        const load = async ({ reply = "", ...cfg }) => {
             await helper.load([server, control], [
                 { id: "s", type: "power-genius-server", host: "127.0.0.1", port: 1, autoConnect: false },
                 { id: "c", type: "power-genius-control", server: "s", ...cfg },
+                { id: "h", type: "helper" },
             ]);
             const srv = helper.getNode("s");
             const calls = [];
-            srv.command = (cmd) => { calls.push(cmd); return Promise.resolve(""); };
+            srv.command = (cmd) => { calls.push(cmd); return Promise.resolve(reply); };
             const node = helper.getNode("c");
             const errors = [];
             node.on("call:error", (call) => errors.push(String(call.args[0])));
-            return { calls, errors, node };
+            const out = [];
+            helper.getNode("h").on("input", (m) => out.push(m));
+            return { calls, errors, out, node };
         };
 
         test("a fixed action wins over msg.topic", async () => {
@@ -152,16 +155,33 @@ describe("nodes", () => {
             expect(calls).toEqual(["operate=0", "operate=1"]);
         });
 
-        test("only operate is accepted", async () => {
+        test("only operate and command are accepted", async () => {
             const { calls, errors, node } = await load({ action: "" });
             node.receive({ topic: "save", payload: 1 });
-            node.receive({ topic: "command", payload: "setup read" });
             node.receive({ topic: "meffa", payload: 1 });
             node.receive({ payload: 1 });
             await tick();
             expect(calls).toEqual([]);
-            expect(errors).toHaveLength(4);
-            expect(errors[0]).toContain("topic must be one of: operate");
+            expect(errors).toHaveLength(3);
+            expect(errors[0]).toContain("topic must be one of: operate, command");
+        });
+
+        test("command sends the payload as it is and outputs the reply", async () => {
+            const { calls, out, node } = await load({ action: "command", reply: "a=1 b=2", wires: [["h"]] });
+            node.receive({ payload: "  setup read " });
+            await tick();
+            expect(calls).toEqual(["setup read"]);
+            expect(out).toHaveLength(1);
+            expect(out[0].topic).toBe("command");
+            expect(out[0].payload).toBe("a=1 b=2");
+        });
+
+        test("command rejects an empty or multi-line payload", async () => {
+            const { calls, errors, node } = await load({ action: "command" });
+            for (const payload of ["", "   ", undefined, null, "status\nsave"]) node.receive({ payload });
+            await tick();
+            expect(calls).toEqual([]);
+            expect(errors).toHaveLength(5);
         });
 
         test("a payload that is not a clear on/off is rejected and nothing is sent", async () => {

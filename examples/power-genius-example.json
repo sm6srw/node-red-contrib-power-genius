@@ -152,8 +152,8 @@
         "id": "pg-comment-control",
         "type": "comment",
         "z": "pg-tab",
-        "name": "Control: operate / standby",
-        "info": "The control node sends 'operate=<0|1>'. The topic is operate, and the payload true/false (or 1/0, on/off). Watch the state property of the status node change between STANDBY and IDLE.",
+        "name": "Control: operate / standby, or any command",
+        "info": "The control node takes its action from msg.topic. With topic 'operate' the payload is true/false (or 1/0, on/off) and 'operate=<0|1>' is sent. With topic 'command' the payload is sent as the command, for example 'setup read' or 'ping', and the reply is output. Watch the state property of the status node change between STANDBY and IDLE.",
         "x": 190,
         "y": 400,
         "wires": []
@@ -193,6 +193,23 @@
         "wires": [["pg-control"]]
     },
     {
+        "id": "pg-inject-command",
+        "type": "inject",
+        "z": "pg-tab",
+        "name": "setup read",
+        "props": [{ "p": "payload" }, { "p": "topic", "vt": "str" }],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "command",
+        "payload": "setup read",
+        "payloadType": "str",
+        "x": 130,
+        "y": 580,
+        "wires": [["pg-control"]]
+    },
+    {
         "id": "pg-control",
         "type": "power-genius-control",
         "z": "pg-tab",
@@ -200,7 +217,22 @@
         "server": "pg-server",
         "action": "",
         "x": 300,
-        "y": 490,
+        "y": 520,
+        "wires": [["pg-debug-reply"]]
+    },
+    {
+        "id": "pg-debug-reply",
+        "type": "debug",
+        "z": "pg-tab",
+        "name": "reply",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 470,
+        "y": 520,
         "wires": []
     }
 ]

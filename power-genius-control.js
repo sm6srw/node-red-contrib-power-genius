@@ -1,5 +1,14 @@
-// Commands the node supports. Only "operate=<0|1>" is known to work on the amplifier.
-const COMMANDS = { operate: (value) => `operate=${value}` };
+// Builds the command to send from the payload. "command" sends the payload as it is, to try commands that
+// are not documented; the amplifier answers an unknown one with an error.
+const COMMANDS = {
+    operate: (payload) => `operate=${parseSwitch(payload)}`,
+    command: (payload) => {
+        const cmd = String(payload === undefined || payload === null ? "" : payload).trim();
+        if (!cmd) throw new Error("payload must be the command to send");
+        if (/[\r\n]/.test(cmd)) throw new Error("payload must be a single line");
+        return cmd;
+    },
+};
 const ACTIONS = Object.keys(COMMANDS);
 
 // true/false, 1/0, "1"/"0" and "on"/"off" (any case). Anything else is rejected, so that a stray payload
@@ -53,7 +62,8 @@ module.exports = (RED) => {
                     if (!ACTIONS.includes(action)) {
                         throw new Error(`topic must be one of: ${ACTIONS.join(", ")}`);
                     }
-                    await this.server.command(COMMANDS[action](parseSwitch(msg.payload)));
+                    const reply = await this.server.command(COMMANDS[action](msg.payload));
+                    send({ ...msg, topic: action, payload: reply });
                     if (done) done();
                 } catch (err) {
                     this.status({ fill: "red", shape: "ring", text: err.message });
