@@ -80,7 +80,7 @@ describe("nodes", () => {
                 { id: "s", type: "power-genius-server", host: "127.0.0.1", port: amp.port, autoConnect: true, pollInterval: 0 },
                 { id: "st", type: "power-genius-status", server: "s", property: "state", startDelay: 0, wires: [["h"]] },
                 { id: "i", type: "power-genius-info", server: "s", property: "ifconf", startDelay: 0, wires: [["h"]] },
-                { id: "c", type: "power-genius-control", server: "s", action: "operate" },
+                { id: "c", type: "power-genius-control", server: "s", action: "" },
                 { id: "h", type: "helper" },
             ]);
             const out = [];
@@ -106,7 +106,7 @@ describe("nodes", () => {
         test("control node sends the set command to the amplifier", async () => {
             await load();
             amp.received.length = 0;
-            helper.getNode("c").receive({ payload: true });
+            helper.getNode("c").receive({ topic: "operate", payload: true });
             await tick(100);
             expect(amp.received).toEqual(["set operate=1"]);
         });
