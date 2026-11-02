@@ -21,19 +21,19 @@ The `status` reply is a list of `key=value` pairs; numbers are emitted as number
 
 | Property | Meaning | Values / unit |
 |---|---|---|
-| `state` | Amplifier state | `STANDBY`, `TRANSMIT_A`, `TRANSMIT_B`; `REBOOT` is sent after `save` |
+| `state` | Amplifier state | `IDLE`, `STANDBY`, `TRANSMIT_A`, `TRANSMIT_B`; `REBOOT` is sent after `save` |
 | `bandA`, `bandB` | Band of slice A / B | metres, e.g. `20` |
 | `bsrcA`, `bsrcB` | Source of the band data | e.g. `FLEX` |
 | `bsrcAutoA`, `bsrcAutoB` | Band source selected automatically | 1 = yes, 0 = no |
 | `flexA`, `flexB` | FlexRadio nickname | text |
 | `vac` | Mains voltage | V |
-| `vdd` | Supply voltage | V |
-| `id`, `peakid` | Drain current, and its peak | A |
-| `fwd`, `peakfwd` | Forward power, and its peak | dBm |
-| `swr` | Return loss | dB (negative; the FLEX `RL` meter) |
+| `vdd` | Supply voltage | V; 0 when not transmitting |
+| `id`, `peakid` | Drain current, and its peak | A; 0 when not transmitting |
+| `fwd`, `peakfwd` | Forward power, and its peak | dBm; `fwd` is 30 (the meter minimum) when there is no RF, `peakfwd` keeps the last peak |
+| `swr` | Return loss | dB (negative, e.g. -18; the FLEX `RL` meter); -60 when there is no RF |
 | `temp` | PA temperature | °C |
 | `hltemp` | Second temperature sensor | °C |
-| `cntfreq` | Frequency counted from the RF | kHz |
+| `cntfreq` | Frequency counted from the RF | kHz, e.g. 14098; 0 when there is no RF |
 | `cat1freq`, `cat2freq` | Frequency from CAT port 1 / 2 | kHz, 0 = none |
 | `biasA`, `biasB` | Bias source | e.g. `RADIO_AB` |
 | `fanmode` | Fan mode | e.g. `STANDARD` |
