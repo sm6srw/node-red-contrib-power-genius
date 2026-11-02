@@ -31,6 +31,7 @@
             <option value="">msg.topic</option>
             <option value="operate">operate</option>
             <option value="antenna">antenna</option>
+            <option value="fanmode">fanmode</option>
             <option value="command">command</option>
         </select>
     </div>
@@ -41,7 +42,7 @@ Controls the Power Genius XL.
 
 ### Input
 
-: topic (string) : `operate`, `antenna` or `command`. Only used when the node's Action is set to `msg.topic`; a fixed action in the node always takes precedence.
+: topic (string) : `operate`, `antenna`, `fanmode` or `command`. Only used when the node's Action is set to `msg.topic`; a fixed action in the node always takes precedence.
 
 : payload (boolean|number|string) : Depends on the action:
 
@@ -49,6 +50,7 @@ Controls the Power Genius XL.
 |---|---|---|
 | `operate` | `true`, `1`, `"1"` or `"on"` for operate, `false`, `0`, `"0"` or `"off"` for standby. Anything else is an error and nothing is sent. | `operate=<1\|0>` |
 | `antenna` | The antenna number, 1-3. Only for amplifiers with the antenna switch; the SO2R version answers with an error | `antenna=<n>` |
+| `fanmode` | `STANDARD`, `CONTEST` or `BROADCAST` (any case). Shows up as `fanmode` in the status | `setup fanmode=<mode>` |
 | `command` | The command, on a single line, for example `setup read` or `ping` | The payload as it is |
 
 ### Output

@@ -164,7 +164,16 @@ describe("nodes", () => {
             expect(errors).toHaveLength(7);
         });
 
-        test("only operate, antenna and command are accepted", async () => {
+        test("fanmode sends setup fanmode=<mode> and only accepts the known modes", async () => {
+            const { calls, errors, node } = await load({ action: "fanmode" });
+            for (const payload of ["contest", " Broadcast ", "STANDARD"]) node.receive({ payload });
+            for (const payload of ["turbo", "", null, undefined, 1]) node.receive({ payload });
+            await tick();
+            expect(calls).toEqual(["setup fanmode=CONTEST", "setup fanmode=BROADCAST", "setup fanmode=STANDARD"]);
+            expect(errors).toHaveLength(5);
+        });
+
+        test("only operate, antenna, fanmode and command are accepted", async () => {
             const { calls, errors, node } = await load({ action: "" });
             node.receive({ topic: "save", payload: 1 });
             node.receive({ topic: "ptt", payload: 1 });
@@ -172,7 +181,7 @@ describe("nodes", () => {
             await tick();
             expect(calls).toEqual([]);
             expect(errors).toHaveLength(3);
-            expect(errors[0]).toContain("topic must be one of: operate, antenna, command");
+            expect(errors[0]).toContain("topic must be one of: operate, fanmode, antenna, command");
         });
 
         test("command sends the payload as it is and outputs the reply", async () => {

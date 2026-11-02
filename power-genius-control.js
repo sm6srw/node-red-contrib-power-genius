@@ -1,7 +1,16 @@
+const FAN_MODES = ["STANDARD", "CONTEST", "BROADCAST"];
+
 // Builds the command to send from the payload. "command" sends the payload as it is, to try commands that
 // are not documented; the amplifier answers an unknown one with an error.
 const COMMANDS = {
     operate: (payload) => `operate=${parseSwitch(payload)}`,
+    fanmode: (payload) => {
+        const mode = String(payload === undefined || payload === null ? "" : payload).trim().toUpperCase();
+        if (!FAN_MODES.includes(mode)) {
+            throw new Error(`payload must be one of: ${FAN_MODES.join(", ")}`);
+        }
+        return `setup fanmode=${mode}`;
+    },
     antenna: (payload) => {
         const n = Number(payload);
         if (payload === "" || payload === null || !Number.isInteger(n) || n < 1 || n > 3) {
