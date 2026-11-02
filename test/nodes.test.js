@@ -20,7 +20,7 @@ const startFakeAmplifier = () => new Promise((resolve) => {
         "catradio read=A": "ampslice=A active=0 type=None",
         "flexradio read=A": "serial=1718-9765-6601-2203 txant=ANT1 ptt=LAN active=1",
         "status": "state=STANDBY temp=31.5 meffa=OFF",
-        "set operate=1": "",
+        "operate=1": "",
     };
     const srv = net.createServer((socket) => {
         socket.write("V3.8.8\r\n");
@@ -103,12 +103,12 @@ describe("nodes", () => {
             );
         });
 
-        test("control node sends the set command to the amplifier", async () => {
+        test("control node sends the operate command to the amplifier", async () => {
             await load();
             amp.received.length = 0;
             helper.getNode("c").receive({ topic: "operate", payload: true });
             await tick(100);
-            expect(amp.received).toEqual(["set operate=1"]);
+            expect(amp.received).toEqual(["operate=1"]);
         });
 
         test("a command the amplifier rejects is reported as an error", async () => {
@@ -116,7 +116,7 @@ describe("nodes", () => {
             const c = helper.getNode("c");
             const errors = [];
             c.on("call:error", (call) => errors.push(call.args[0]));
-            c.receive({ topic: "bias", payload: 1 });
+            c.receive({ topic: "operate", payload: false });
             await tick(100);
             expect(String(errors[0])).toContain("Command error");
         });
@@ -139,29 +139,29 @@ describe("nodes", () => {
 
         test("a fixed action wins over msg.topic", async () => {
             const { calls, node } = await load({ action: "operate" });
-            node.receive({ topic: "meffa", payload: 1 });
+            node.receive({ topic: "save", payload: 1 });
             await tick();
-            expect(calls).toEqual(["set operate=1"]);
+            expect(calls).toEqual(["operate=1"]);
         });
 
         test("msg.topic is used when no action is fixed", async () => {
             const { calls, node } = await load({ action: "" });
-            node.receive({ topic: "antenna", payload: "off" });
-            node.receive({ topic: "Meffa", payload: true });
-            node.receive({ topic: "bias", payload: "0" });
+            node.receive({ topic: "operate", payload: "off" });
+            node.receive({ topic: "Operate", payload: true });
             await tick();
-            expect(calls).toEqual(["set antenna=0", "set meffa=1", "set bias=0"]);
+            expect(calls).toEqual(["operate=0", "operate=1"]);
         });
 
-        test("only operate, antenna, meffa and bias are accepted", async () => {
+        test("only operate is accepted", async () => {
             const { calls, errors, node } = await load({ action: "" });
             node.receive({ topic: "save", payload: 1 });
             node.receive({ topic: "command", payload: "setup read" });
+            node.receive({ topic: "meffa", payload: 1 });
             node.receive({ payload: 1 });
             await tick();
             expect(calls).toEqual([]);
-            expect(errors).toHaveLength(3);
-            expect(errors[0]).toContain("operate, antenna, meffa, bias");
+            expect(errors).toHaveLength(4);
+            expect(errors[0]).toContain("topic must be one of: operate");
         });
 
         test("a payload that is not a clear on/off is rejected and nothing is sent", async () => {

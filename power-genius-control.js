@@ -1,4 +1,6 @@
-const ACTIONS = ["operate", "antenna", "meffa", "bias"];
+// Commands the node supports. Only "operate=<0|1>" is known to work on the amplifier.
+const COMMANDS = { operate: (value) => `operate=${value}` };
+const ACTIONS = Object.keys(COMMANDS);
 
 // true/false, 1/0, "1"/"0" and "on"/"off" (any case). Anything else is rejected, so that a stray payload
 // can never switch the amplifier by accident.
@@ -51,7 +53,7 @@ module.exports = (RED) => {
                     if (!ACTIONS.includes(action)) {
                         throw new Error(`topic must be one of: ${ACTIONS.join(", ")}`);
                     }
-                    await this.server.command(`set ${action}=${parseSwitch(msg.payload)}`);
+                    await this.server.command(COMMANDS[action](parseSwitch(msg.payload)));
                     if (done) done();
                 } catch (err) {
                     this.status({ fill: "red", shape: "ring", text: err.message });

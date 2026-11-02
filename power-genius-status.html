@@ -114,7 +114,7 @@ The `status` reply is a list of `key=value` pairs. Numeric values are emitted as
 
 | Property | Meaning | Values / unit |
 |---|---|---|
-| `state` | Amplifier state | `IDLE`, `STANDBY`, `TRANSMIT_A`, `TRANSMIT_B` |
+| `state` | Amplifier state | `STANDBY`, `IDLE` (operate, not transmitting), `TRANSMIT_A`, `TRANSMIT_B`; probably `FAULT` |
 | `bandA`, `bandB` | Band of slice A / B | metres, e.g. `20` |
 | `bsrcA`, `bsrcB` | Source of the band data | e.g. `FLEX` |
 | `bsrcAutoA`, `bsrcAutoB` | Band source selected automatically | 1 = yes, 0 = no |
@@ -128,9 +128,9 @@ The `status` reply is a list of `key=value` pairs. Numeric values are emitted as
 | `hltemp` | Harmonic load temperature | °C |
 | `cntfreq` | Frequency counted from the RF | kHz, e.g. 14098; 0 when there is no RF |
 | `cat1freq`, `cat2freq` | Frequency from CAT port 1 / 2 | kHz, 0 = none |
-| `biasA`, `biasB` | Bias source | e.g. `RADIO_AB` |
+| `biasA`, `biasB` | Bias setting of input A / B, as `SOURCE_MODE` | e.g. `RADIO_AB`; others seen elsewhere: `AUTO_AAB`, `MANUAL_A` |
 | `fanmode` | Fan mode | e.g. `STANDARD` |
-| `meffa` | MeFFA state | `OFF`, `ACTIVE` |
+| `meffa` | MeFFA state | `OFF`, `ACTIVE`; may name a fault such as SWR, TEMP or CURRENT |
 | `unkey` | Protection fault | 1 = active protection fault, 0 = normal operation |
 | `antA` | Antenna connector that input A is physically connected to | 0 or 1 (0 is presumably ANT1 and 1 ANT2; only 0 seen) |
 | `ants` | Antenna routing of the two ports | 0 = A to ANT1 and B to ANT2 (straight), 1 = A to ANT2 and B to ANT1 (crossed); only 0 seen |

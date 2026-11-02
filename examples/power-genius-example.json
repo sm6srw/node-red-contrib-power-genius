@@ -153,7 +153,7 @@
         "type": "comment",
         "z": "pg-tab",
         "name": "Control: operate / standby",
-        "info": "The control node sends 'set <topic>=<0|1>'. The topic can be operate, antenna, meffa or bias, and the payload true/false (or 1/0, on/off). Watch the state property of the status node change.",
+        "info": "The control node sends 'operate=<0|1>'. The topic is operate, and the payload true/false (or 1/0, on/off). Watch the state property of the status node change between STANDBY and IDLE.",
         "x": 190,
         "y": 400,
         "wires": []

@@ -30,9 +30,6 @@
         <select id="node-input-action">
             <option value="">msg.topic</option>
             <option value="operate">operate</option>
-            <option value="antenna">antenna</option>
-            <option value="meffa">meffa</option>
-            <option value="bias">bias</option>
         </select>
     </div>
 </script>
@@ -42,17 +39,14 @@ Controls the Power Genius XL.
 
 ### Input
 
-: topic (string) : `operate`, `antenna`, `meffa` or `bias`. Only used when the node's Action is set to `msg.topic`; a fixed action in the node always takes precedence.
+: topic (string) : `operate`. Only used when the node's Action is set to `msg.topic`; a fixed action in the node always takes precedence.
 
 : payload (boolean|number|string) : `true`, `1`, `"1"` or `"on"` for 1, and `false`, `0`, `"0"` or `"off"` for 0. Anything else is an error and nothing is sent.
 
 | Action | Command sent | 0 | 1 |
 |---|---|---|---|
-| `operate` | `set operate=<0\|1>` | Standby | Operate |
-| `antenna` | `set antenna=<0\|1>` | Straight routing of the ports (status `ants` = 0) | Crossed routing (status `ants` = 1) |
-| `meffa` | `set meffa=<0\|1>` | MeFFA off | MeFFA on |
-| `bias` | `set bias=<0\|1>` | Bias profile 0 | Bias profile 1 |
+| `operate` | `operate=<0\|1>` | Standby | Operate |
 
-A failed command is reported as an error on the node. The effect shows up in the status, for example `state`,
-`ants` and `meffa`.
+A failed command is reported as an error on the node. The effect shows up in the status `state`
+(`STANDBY`, or `IDLE` when operating).
 </script>
