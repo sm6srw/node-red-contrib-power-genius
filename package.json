@@ -8,7 +8,9 @@
     "pgxl",
     "4o3a",
     "flexradio",
-    "ham radio"
+    "ham radio",
+    "sm6srw",
+    "nu1t"
   ],
   "scripts": {
     "test": "jest --coverage",
