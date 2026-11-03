@@ -3,6 +3,9 @@
 Node-RED nodes for monitoring a FlexRadio / 4O3A PowerGenius XL (PGXL) amplifier over its TCP API (port 9008).
 Framing: `C<seq>|<command>` request, `R<seq>|<hex>|<message>` reply, `S<n>|<message>` asynchronous status.
 
+Requires Node.js 18 or newer and Node-RED 3.1.0 or newer.
+
+[![Node.js CI](https://github.com/sm6srw/node-red-contrib-power-genius/actions/workflows/node.js.yml/badge.svg)](https://github.com/sm6srw/node-red-contrib-power-genius/actions/workflows/node.js.yml) [![Node.js Package](https://github.com/sm6srw/node-red-contrib-power-genius/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/sm6srw/node-red-contrib-power-genius/actions/workflows/npm-publish.yml) [![CodeQL](https://github.com/sm6srw/node-red-contrib-power-genius/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/sm6srw/node-red-contrib-power-genius/actions/workflows/codeql-analysis.yml) [![njsscan sarif](https://github.com/sm6srw/node-red-contrib-power-genius/actions/workflows/njsscan-analysis.yml/badge.svg)](https://github.com/sm6srw/node-red-contrib-power-genius/actions/workflows/njsscan-analysis.yml)
 > **Work in progress.** The API documentation ([API Docs](API%20Docs/PGXL-Amplifier-to-Radio-API-Documentation.pdf),
 > firmware 3.8.8) only covers a few commands and says little about the replies, so the nodes keep whatever the
 > amplifier sends. The property tables below come from a real amplifier (firmware 3.9.9); units not given in the
